@@ -18,7 +18,7 @@ export class MovieHandler {
    *
    * @param {string} day - The day to check available movies on.
    * @param {string} url - The page to check movies on.
-   * @return {Object} - An object with all movies and their start time available.
+   * @return {object} - An object with all movies and their start time available.
    */
   async availableMovies (day, url) {
     // Get the initial page.
@@ -46,6 +46,25 @@ export class MovieHandler {
       movieValues.push(dom(element).val())
     })
 
-    const submitButton = dom('button[id="check"]')
+    // Start iterating through the movies.
+    for (let i = 0; i < movieValues.length; i++) {
+      const value = movieValues[i]
+
+      // Make a request for each movie.
+      const movieResponse = await axios.get(url, {
+        params: {
+          day: dayValue,
+          movie: value
+        }
+      })
+
+      // Get the updated HTML and DOM.
+      const updatedHTML = movieResponse.data
+      const updatedDOM = cheerio.load(updatedHTML)
+
+      // const availableTimes = updatedDOM('div[id="message"]').text()
+
+      const submitButton = dom('button[id="check"]')
+    }
   }
 }
