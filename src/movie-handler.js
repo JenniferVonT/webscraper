@@ -7,6 +7,7 @@
 
 import axios from 'axios'
 import * as cheerio from 'cheerio'
+import { select } from 'cheerio-select'
 
 /**
  * Handles the data from a movie-theatre web page.
@@ -30,10 +31,21 @@ export class MovieHandler {
     const html = response.data
     const dom = cheerio.load(html)
 
-    // Get all the form elements and the submit button.
-    const selectDay = dom('form[action="cinema/day"]')
-    const selectMovie = dom('form[action="cinema/movie"]')
-    const submitButton = dom('button[id="check"]')
+    // Get the select element for the day form.
+    const selectDay = dom('select[id="day"]')
+    // Set the value on the the select element to the corresponding day.
+    const dayValue = selectDay.find(`option:contains(${day})`)
+    selectDay.val(dayValue.val())
 
+    // Get all the values for the option elements.
+    const selectMovie = dom('select[id="movie"]')
+    const movieOptions = selectMovie.find('option[value]')
+    const movieValues = []
+
+    movieOptions.each((index, element) => {
+      movieValues.push(dom(element).val())
+    })
+
+    const submitButton = dom('button[id="check"]')
   }
 }

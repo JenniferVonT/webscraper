@@ -79,13 +79,15 @@ export class Application {
       return `${calendarURL}${relativeLink.slice(2)}`
     })
 
-    const calenderHandler = new CalendarHandler()
     // Check for available days!
+    const calenderHandler = new CalendarHandler()
+
     const availableDays = await calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
 
+    // Check for available movies! 
     const movieHandler = new MovieHandler()
     const movies = []
-    // Check for available movies! <----------------------------------!!!!! INSERT CODE UNDER HERE.
+
     await availableDays.forEach((day) => {
       movies.push(movieHandler.availableMovies(day, movieURL))
     })
