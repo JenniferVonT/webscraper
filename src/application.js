@@ -5,7 +5,6 @@
  * @version 1.0.0
  */
 
-import { readFile, writeFile } from 'node:fs/promises'
 import validator from 'validator'
 import { LinkScraper } from './link-scraper.js'
 import { CalendarHandler } from './calender-handler.js'
@@ -67,10 +66,17 @@ export class Application {
     const movieURL = initialLinks.find(url => /cinema/.test(url))
     const restaurantURL = initialLinks.find(url => /dinner/.test(url))
 
-    // Start with the calendar, extract all three indiviual calendars.
+    // Get all the calendars links (relative paths) and make them absoulte paths.
     const calendars = await linkScraper.extractLinks(calendarURL)
+
+    // Concatenate them with the absolute path to get absolute URLs.
+    const absoluteCalendarLinks = calendars.map(relativeLink => {
+      return `${calendarURL}${relativeLink.slice(2)}`
+    })
+
     const calenderHandler = new CalendarHandler()
     // Check for available days! <------------------------------------!!!!! INSERT CODE UNDER HERE.
+    calenderHandler.checkForAvailibleDate(absoluteCalendarLinks)
 
     const movieHandler = new MovieHandler()
     // Check for available movies! <----------------------------------!!!!! INSERT CODE UNDER HERE.

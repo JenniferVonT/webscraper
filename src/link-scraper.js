@@ -29,7 +29,7 @@ export class LinkScraper {
 
     // Bind the data (html content) from the response and initialize the cheerio function load,
     // to be able to query and manipulate the data.
-    const html = response.data
+    const html = await response.data
     const dom = cheerio.load(html)
 
     // Parse for all a-elements with the correct href attribute (i.e all links)
