@@ -34,12 +34,11 @@ export class LinkScraper {
 
     // Parse for all a-elements with the correct href attribute (i.e all links)
     const allLinks = []
-    dom('[href^="http://"], a[href^="https://"]').each((index, element) => {
+    dom('a[href]').each((index, element) => {
       const link = dom(element).attr('href')
       allLinks.push(link)
     })
 
-    console.log(allLinks)
     return [...new Set(allLinks)].sort()
   }
 }

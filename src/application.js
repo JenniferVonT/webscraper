@@ -23,30 +23,12 @@ export class Application {
   #url
 
   /**
-   * The restaurant URL.
-   */
-  #restaurantURL
-
-  /**
-   * The calendar URL.
-   */
-  #calendarURL
-
-  /**
-   * The movie URL.
-   */
-  #movieURL
-
-  /**
    * Initiates the class.
    *
    * @param {string} url - The url to begin the scraping.
    */
   constructor (url) {
     this.#url = url
-    this.#restaurantURL = ''
-    this.#calendarURL = ''
-    this.#movieURL = ''
   }
 
   /**
@@ -76,7 +58,26 @@ export class Application {
    * Begins the application.
    */
   async run () {
+    // Get the initial links on the starting site.
     const linkScraper = new LinkScraper()
-    linkScraper.extractLinks(this.#url)
+    const initialLinks = await linkScraper.extractLinks(this.#url)
+
+    // Get the correct URLs for the different sites.
+    const calendarURL = initialLinks.find(url => /calendar/.test(url))
+    const movieURL = initialLinks.find(url => /cinema/.test(url))
+    const restaurantURL = initialLinks.find(url => /dinner/.test(url))
+
+    // Start with the calendar, extract all three indiviual calendars.
+    const calendars = await linkScraper.extractLinks(calendarURL)
+    const calenderHandler = new CalendarHandler()
+    // Check for available days! <------------------------------------!!!!! INSERT CODE UNDER HERE.
+
+    const movieHandler = new MovieHandler()
+    // Check for available movies! <----------------------------------!!!!! INSERT CODE UNDER HERE.
+
+    const restaurantHandler = new RestaurantHandler()
+    // Check for available tables! <----------------------------------!!!!! INSERT CODE UNDER HERE.
+
+    // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
   }
 }
