@@ -5,4 +5,7 @@
  * @version 1.0.0
  */
 
+/**
+ * Handles the data from scraping a calendar web page.
+ */
 export class CalendarHandler {}

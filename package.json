@@ -15,6 +15,7 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "@lnu/eslint-config": "^1.1.10",
     "axios": "^1.6.3",
     "cheerio": "^1.0.0-rc.12",
     "link-scraper": "^1.4.0",

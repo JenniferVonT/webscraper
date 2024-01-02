@@ -17,66 +17,66 @@ import { link } from 'node:fs'
  * Encapsulates a Node application.
  */
 export class Application {
-    /**
-     * The URL to scrape.
-     */
-    #url
+  /**
+   * The URL to scrape.
+   */
+  #url
 
-    /**
-     * The restaurant URL.
-     */
-    #restaurantURL
+  /**
+   * The restaurant URL.
+   */
+  #restaurantURL
 
-    /**
-     * The calendar URL.
-     */
-    #calendarURL
+  /**
+   * The calendar URL.
+   */
+  #calendarURL
 
-    /**
-     * The movie URL.
-     */
-    #movieURL
+  /**
+   * The movie URL.
+   */
+  #movieURL
 
-    /**
-     * Initiates the class.
-     *
-     * @param {string} url - The url to begin the scraping.
-     */
-    constructor (url) {
-        this.#url = url
-        this.#restaurantURL = ''
-        this.#calendarURL = ''
-        this.#movieURL = ''
+  /**
+   * Initiates the class.
+   *
+   * @param {string} url - The url to begin the scraping.
+   */
+  constructor (url) {
+    this.#url = url
+    this.#restaurantURL = ''
+    this.#calendarURL = ''
+    this.#movieURL = ''
+  }
+
+  /**
+   * Gets the current URL.
+   *
+   * @returns {string} The url to begin the scraping with.
+   */
+  get url () {
+    return this.#url
+  }
+
+  /**
+   * Sets the URL to scrape.
+   *
+   * @param {string} argument - The new URL to scrape.
+   */
+  set url (argument) {
+    // Validate if the argument is empty or if it follows correct URL syntax.
+    if (argument.length === 0 || validator.isURL(argument)) {
+      throw new Error('not a URL.')
     }
 
-    /**
-     * Gets the current URL.
-     *
-     * @returns {string} The url to begin the scraping with.
-     */
-    get url () {
-        return this.#url
-    }
+    this.#url = argument
+  }
 
-    /**
-     * Sets the URL to scrape.
-     *
-     * @param {string} arguments - The new URL to scrape.
-     */
-    set url (argument) {
-        // Validate if the argument is empty or if it follows correct URL syntax.
-        if (argument.length === 0 || validator.isURL(argument)) {
-            throw new Error('not a URL.')
-        }
-
-        this.#url = argument
-    }
-
-    /**
-     * Begins the application.
-     */
-    async run () {
-        const linkScraper = new LinkScraper()
-        linkScraper.extractLinks(this.#url)
-    }
+  /**
+   * Begins the application.
+   */
+  async run () {
+    const linkScraper = new LinkScraper()
+    linkScraper.extractLinks(this.#url)
+  }
 }

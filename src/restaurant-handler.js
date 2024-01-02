@@ -5,4 +5,7 @@
  * @version 1.0.0
  */
 
+/**
+ * Handles data from a restaurant web page.
+ */
 export class RestaurantHandler {}

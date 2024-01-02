@@ -8,12 +8,11 @@
 import { Application } from './application.js'
 
 try {
-    // Get the command prompts from the command-line (skip the first two) 
-    const [,, url] = process.argv
+  // Get the command prompts from the command-line (skip the first two)
+  const [,, url] = process.argv
 
-    const application = new Application(url)
-    await application.run()
-
+  const application = new Application(url)
+  await application.run()
 } catch (error) {
-    console.error(error.message)
+  console.error(error.message)
 }

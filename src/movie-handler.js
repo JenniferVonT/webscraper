@@ -5,4 +5,7 @@
  * @version 1.0.0
  */
 
+/**
+ * Handles the data from a movie-theatre web page.
+ */
 export class MovieHandler {}
