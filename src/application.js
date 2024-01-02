@@ -27,6 +27,11 @@ export class Application {
    * @param {string} url - The url to begin the scraping.
    */
   constructor (url) {
+    // Validate if the argument is empty or if it follows correct URL syntax.
+    if (url.length === 0 || !validator.isURL(url)) {
+      throw new Error('not a URL.')
+    }
+
     this.#url = url
   }
 
@@ -46,7 +51,7 @@ export class Application {
    */
   set url (argument) {
     // Validate if the argument is empty or if it follows correct URL syntax.
-    if (argument.length === 0 || validator.isURL(argument)) {
+    if (argument.length === 0 || !validator.isURL(argument)) {
       throw new Error('not a URL.')
     }
 
@@ -75,11 +80,15 @@ export class Application {
     })
 
     const calenderHandler = new CalendarHandler()
-    // Check for available days! <------------------------------------!!!!! INSERT CODE UNDER HERE.
-    calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
+    // Check for available days!
+    const availableDays = await calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
 
     const movieHandler = new MovieHandler()
+    const movies = []
     // Check for available movies! <----------------------------------!!!!! INSERT CODE UNDER HERE.
+    await availableDays.forEach((day) => {
+      movies.push(movieHandler.availableMovies(day, movieURL))
+    })
 
     const restaurantHandler = new RestaurantHandler()
     // Check for available tables! <----------------------------------!!!!! INSERT CODE UNDER HERE.

@@ -55,14 +55,17 @@ export class CalendarHandler {
     const friday = availableDates
       .filter((obj) => obj.day === 'Friday')
       .map(obj => obj.name)
+      // => [ 'Mary', 'Paul', 'Peter' ] (site1)
 
     const saturday = availableDates
       .filter((obj) => obj.day === 'Saturday')
       .map(obj => obj.name)
+      // => [ 'Mary', 'Paul' ] (site1)
 
     const sunday = availableDates
       .filter((obj) => obj.day === 'Sunday')
       .map(obj => obj.name)
+      // => [ 'Peter' ] (site1)
 
     const match = []
 
