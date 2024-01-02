@@ -76,7 +76,7 @@ export class Application {
 
     const calenderHandler = new CalendarHandler()
     // Check for available days! <------------------------------------!!!!! INSERT CODE UNDER HERE.
-    calenderHandler.checkForAvailibleDate(absoluteCalendarLinks)
+    calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
 
     const movieHandler = new MovieHandler()
     // Check for available movies! <----------------------------------!!!!! INSERT CODE UNDER HERE.
