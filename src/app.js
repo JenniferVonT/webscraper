@@ -5,7 +5,15 @@
  * @version 1.0.0
  */
 
-import { CalendarHandler } from './calender-handler.js'
-import { MovieHandler } from './movie-handler.js'
-import { RestaurantHandler } from './restaurant-handler.js'
 import { Application } from './application.js'
+
+try {
+    // Get the command prompts from the command-line (skip the first two) 
+    const [,, url] = process.argv
+
+    const application = new Application(url)
+    await application.run()
+
+} catch (error) {
+    console.error(error.message)
+}
