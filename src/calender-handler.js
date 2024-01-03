@@ -80,6 +80,10 @@ export class CalendarHandler {
       match.push('Sunday')
     }
 
-    return match
+    if (match.length === 0) {
+      return 'No dates available this time!'
+    } else {
+      return match
+    }
   }
 }

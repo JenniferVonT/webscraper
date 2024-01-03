@@ -100,7 +100,9 @@ export class Application {
     })
 
     const restaurantHandler = new RestaurantHandler()
-    // Check for available tables! <----------------------------------!!!!! INSERT CODE UNDER HERE.
+    const dinnerTimes = []
+
+    restaurantHandler.checkRestaurantBooking(movies[0].day, parseInt(movies[0].time) + 2, restaurantURL)
 
     // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
   }
