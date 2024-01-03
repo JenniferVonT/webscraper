@@ -84,12 +84,19 @@ export class Application {
 
     const availableDays = await calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
 
-    // Check for available movies! 
+    // Create a new instance of the movie handler.
     const movieHandler = new MovieHandler()
     const movies = []
 
-    await availableDays.forEach((day) => {
-      movies.push(day, movieHandler.availableMovies(day, movieURL))
+    // Create an array of promises
+    const moviePromises = availableDays.map((day) => movieHandler.availableMovies(day, movieURL))
+
+    // Resolve all promises before moving on.
+    const allMovies = await Promise.all(moviePromises)
+
+    // Flatten the array of arrays into a single array.
+    allMovies.forEach((movie) => {
+      movies.push(...movie)
     })
 
     const restaurantHandler = new RestaurantHandler()

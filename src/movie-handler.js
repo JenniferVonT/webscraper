@@ -17,7 +17,7 @@ export class MovieHandler {
    *
    * @param {string} day - The day to check available movies on.
    * @param {string} url - The page to check movies on.
-   * @return {Array} - An array of objects with all movies and their start time available.
+   * @returns {Array} - An array of objects with all movies and their start time available.
    */
   async availableMovies (day, url) {
     // Get the initial page.
