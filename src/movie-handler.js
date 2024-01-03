@@ -7,7 +7,6 @@
 
 import axios from 'axios'
 import * as cheerio from 'cheerio'
-import { select } from 'cheerio-select'
 
 /**
  * Handles the data from a movie-theatre web page.
@@ -18,7 +17,7 @@ export class MovieHandler {
    *
    * @param {string} day - The day to check available movies on.
    * @param {string} url - The page to check movies on.
-   * @return {object} - An object with all movies and their start time available.
+   * @return {Array} - An array of objects with all movies and their start time available.
    */
   async availableMovies (day, url) {
     // Get the initial page.
@@ -33,18 +32,20 @@ export class MovieHandler {
 
     // Get the select element for the day form.
     const selectDay = dom('select[id="day"]')
-    // Set the value on the the select element to the corresponding day.
+    // Get the value for the correct day.
     const dayValue = selectDay.find(`option:contains(${day})`).val()
-    selectDay.val(dayValue)
 
-    // Get all the values for the option elements.
+    // Get all the values for the movies.
     const selectMovie = dom('select[id="movie"]')
     const movieOptions = selectMovie.find('option[value]')
     const movieValues = movieOptions.map((index, element) => dom(element).val()).get()
 
+    // Create an empty array where all the movie data can go later.
+    const finalMovieInfo = []
+
     // Start iterating through the movies.
     for (let i = 0; i < movieValues.length; i++) {
-      // Make a request for each movie.
+      // Make a request for each movie, sending the values for day and movie.
       const movieResponse = await axios.get(`${url}/check`, {
         params: {
           day: dayValue,
@@ -54,7 +55,25 @@ export class MovieHandler {
 
       // Get the response object from the request.
       const responseData = movieResponse.data
-      console.log(responseData)
+
+      // Filter out so only the objects with status 1 in them is left (the ones available).
+      const allMovies = responseData.filter(item => item.status === 1)
+
+      // Get the movie name.
+      const movieName = dom(`option[value=${movieValues[i]}]`).text()
+
+      // Gather all movie info to be returned, day, time and name.
+      allMovies.forEach(movie => {
+        const movieInfo = {
+          day,
+          time: movie.time,
+          movie: movieName
+        }
+
+        finalMovieInfo.push(movieInfo)
+      })
     }
+
+    return finalMovieInfo
   }
 }

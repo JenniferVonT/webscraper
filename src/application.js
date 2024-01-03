@@ -89,7 +89,7 @@ export class Application {
     const movies = []
 
     await availableDays.forEach((day) => {
-      movies.push(movieHandler.availableMovies(day, movieURL))
+      movies.push(day, movieHandler.availableMovies(day, movieURL))
     })
 
     const restaurantHandler = new RestaurantHandler()
