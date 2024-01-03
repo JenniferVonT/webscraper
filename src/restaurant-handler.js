@@ -16,36 +16,53 @@ export class RestaurantHandler {
    * Checks if there is any free tables during a certain day/time.
    *
    * @param {string} day - What day do you want to book.
-   * @param {number} time - What's the earliest time you want to book.
+   * @param {string} time - What's the earliest time you want to book.
    * @param {string} url - The restaurant url.
    */
   async checkRestaurantBooking (day, time, url) {
     const availableTables = []
 
-    // Send a post request to the page with username and password
+    // Send a post request to the page with the form data and headers.
     const loginResponse = await axios.post(`${url}login`, {
-      param: {
-        username: 'zeke',
-        password: 'coys',
-        submit: 'login'
-      }
+      username: 'zeke',
+      password: 'coys',
+      submit: 'login'
+    },
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      maxRedirects: 0,
+      manualRedirect: true
     })
 
     if (loginResponse.status !== 302) {
-      throw new Error(`Login failed! Status: ${loginResponse.status}`)
+      throw new Error('Login failed! Status:', loginResponse.status)
     }
 
     // Get the session cookie from the response headers.
     const sessionCookie = loginResponse.headers['set-cookie']
 
-    // Save it to axios for convenience.
-    axios.defaults.headers.common.Cookie = sessionCookie
+    const redirectURL = loginResponse.headers.location
 
-    const bookingResponse = await axios.get(`${url}/login/booking`)
+    const redirectResponse = await axios.get(`${url}${redirectURL}`, {
+      headers: {
+        Cookie: sessionCookie
+      }
+    })
 
-    const html = bookingResponse.data
+    if (redirectResponse.status !== 200) {
+      throw new Error(`Redirect error: ${loginResponse.status}`)
+    }
+
+    console.log('Response Status:', redirectResponse.status)
+    console.log('Response Headers:', redirectResponse.headers)
+
+    const html = redirectResponse.data
     const dom = cheerio.load(html)
 
-    console.log(dom.text())
+    // Get all friday data.
+    const div = dom('div.WordSection2')
+    const spanElement = div.find('span')
   }
 }

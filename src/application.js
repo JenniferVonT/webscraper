@@ -102,7 +102,7 @@ export class Application {
     const restaurantHandler = new RestaurantHandler()
     const dinnerTimes = []
 
-    restaurantHandler.checkRestaurantBooking(movies[0].day, parseInt(movies[0].time) + 2, restaurantURL)
+    restaurantHandler.checkRestaurantBooking(movies[0].day, movies[0].time, restaurantURL)
 
     // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
   }
