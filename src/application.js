@@ -179,6 +179,12 @@ export class Application {
         process.stdout.write(`On ${availableDayPlans[i].day}, `)
         console.log('\x1b[32m%s\x1b[0m', `"${availableDayPlans[i].movie}"`, `begins at ${availableDayPlans[i].movieStart}, and there is a free table to book between ${availableDayPlans[i].dinner}`)
       }
+
+      // If there is only one available time suggestion, book the table!
+      if (availableDayPlans.length === 1) {
+        const book = availableDayPlans[0]
+        restaurantHandler.bookTable(book.day, book.dinner)
+      }
     } else {
       console.log('\x1b[31m%s\x1b[0m', '\n==== There was no available match for both movies and dinner at Zekes! ====')
     }

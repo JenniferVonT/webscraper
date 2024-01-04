@@ -24,11 +24,17 @@ export class RestaurantHandler {
   #bookingURL
 
   /**
+   * Represents the CSRF token.
+   */
+  #CSRFToken
+
+  /**
    * Creates an instance of the class.
    */
   constructor () {
     this.#cookieJar = new CookieJar()
     this.#bookingURL = ''
+    this.#CSRFToken = ''
   }
 
   /**
@@ -60,7 +66,7 @@ export class RestaurantHandler {
       const redirectURL = loginResponse.headers.get('location')
       this.#bookingURL = `${url}${redirectURL}`
       const sessionCookieValue = loginResponse.headers.get('set-cookie')
-      const cookie = Cookie.parse(`dinnerCookie=${sessionCookieValue}`)
+      const cookie = Cookie.parse(sessionCookieValue)
       this.#cookieJar.setCookie(cookie, this.#bookingURL)
 
       // Send a GET request with the cookie data to get the logged in page.
@@ -77,6 +83,9 @@ export class RestaurantHandler {
 
       const html = await redirectResponse.text()
       const dom = cheerio.load(html)
+
+      // Save the CSRF token.
+      this.#CSRFToken = dom('input[name="csrf_token"]').attr('value')
 
       // Get all the input elements with the attribute 'name' with the value 'group1'.
       // After that get all the value attributes for each element.
@@ -119,7 +128,42 @@ export class RestaurantHandler {
     }
   }
 
-  async bookTable (day, time, url) {
+  /**
+   * Book a table at the restaurant.
+   *
+   * @param {string} day - The day to book.
+   * @param {string} time - The time to book using a 24h clock syntax, ex '18:00-20:00'.
+   */
+  async bookTable (day, time) {
+    try {
+      // filter the input to match the required parameters for the post.
+      const dayCode = day.toLocaleLowerCase().slice(0, 3)
+      const timeCode = parseInt(time.slice(0, 2)).toString() + parseInt(time.slice(6, 8)).toString()
+      const bookingCode = `${dayCode}${timeCode}`
 
+      // Get the stored cookie.
+      const cookie = this.#cookieJar.getCookiesSync(this.#bookingURL)
+
+      const params = new URLSearchParams()
+      params.append('group1', bookingCode)
+      params.append('csrf_token', this.#CSRFToken)
+
+      const bookingResponse = await fetch(this.#bookingURL, {
+        method: 'POST',
+        body: params,
+        redirect: 'manual',
+        headers: {
+          Cookie: cookie
+        }
+      })
+
+      if (bookingResponse.status === 200) {
+        console.log('\x1b[35m%s\x1b[0m', '==== Your table is booked! ====')
+      } else {
+        console.log('Booking failed! Could not book a table at this moment, please visit the restaurants website to book!')
+      }
+    } catch (err) {
+      console.log('Error:', err.message)
+    }
   }
 }
