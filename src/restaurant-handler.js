@@ -7,11 +7,30 @@
 
 import * as cheerio from 'cheerio'
 import fetch from 'node-fetch'
+import { CookieJar, Cookie } from 'tough-cookie'
 
 /**
  * Handles data from a restaurant web page.
  */
 export class RestaurantHandler {
+  /**
+   * Represents a cookie jar.
+   */
+  #cookieJar
+
+  /**
+   * Represents the booking url.
+   */
+  #bookingURL
+
+  /**
+   * Creates an instance of the class.
+   */
+  constructor () {
+    this.#cookieJar = new CookieJar()
+    this.#bookingURL = ''
+  }
+
   /**
    * Checks if there is any free tables during a certain day/time.
    *
@@ -37,15 +56,18 @@ export class RestaurantHandler {
         }
       })
 
-      // Save the session cookie for the login and the redirect URL.
-      const sessionCookie = loginResponse.headers.get('set-cookie')
+      // Save the session cookie in a cookie jar and the redirect URL.
       const redirectURL = loginResponse.headers.get('location')
+      this.#bookingURL = `${url}${redirectURL}`
+      const sessionCookieValue = loginResponse.headers.get('set-cookie')
+      const cookie = Cookie.parse(`dinnerCookie=${sessionCookieValue}`)
+      this.#cookieJar.setCookie(cookie, this.#bookingURL)
 
       // Send a GET request with the cookie data to get the logged in page.
-      const redirectResponse = await fetch(`${url}${redirectURL}`, {
+      const redirectResponse = await fetch(this.#bookingURL, {
         method: 'GET',
         headers: {
-          cookie: sessionCookie
+          cookie: sessionCookieValue
         }
       })
 
@@ -95,5 +117,9 @@ export class RestaurantHandler {
     } catch (error) {
       console.error('Error:', error.message)
     }
+  }
+
+  async bookTable (day, time, url) {
+
   }
 }

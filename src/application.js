@@ -170,7 +170,7 @@ export class Application {
     }
 
     // If there is a movie/dinner match then present the day plans for those, otherwise send a message informing the user of that!
-    if (!availableDayPlans.length === 0) {
+    if (availableDayPlans.length !== 0) {
       console.log('\n\nSuggestions')
       console.log('\x1b[35m%s\x1b[0m', '===========')
 
