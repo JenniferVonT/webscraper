@@ -16,13 +16,11 @@ export class RestaurantHandler {
    * Checks if there is any free tables during a certain day/time.
    *
    * @param {string} day - What day do you want to book.
-   * @param {string} time - The earliest time you want to book.
+   * @param {string} time - The earliest time you want to book in a 24h clock syntax, example: 18:00.
    * @param {string} url - The restaurant url.
    * @returns {string[]} - Returns the matching times.
    */
   async checkRestaurantBooking (day, time, url) {
-    const matchingDinnerTimes = []
-
     const params = new URLSearchParams()
     params.append('username', 'zeke')
     params.append('password', 'coys')
@@ -88,7 +86,9 @@ export class RestaurantHandler {
 
       // Return the result based on if a match was made.
       if (matchingDays.length === 0) {
-        return 'No bookable tables matched that day/time! Try a different time.'
+        return 'No bookable tables matched that day!'
+      } else if (matchingTimes.length === 0) {
+        return 'No bookable tables matched that time of day'
       } else {
         return [day, matchingTimes].flat()
       }

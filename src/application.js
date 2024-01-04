@@ -94,7 +94,7 @@ export class Application {
     // Resolve all promises before moving on.
     const allMovies = await Promise.all(moviePromises)
 
-    // Flatten the array of arrays into a single array.
+    // Flatten the array of arrays into a single array (the movies constant).
     allMovies.forEach((movie) => {
       movies.push(...movie)
     })
@@ -102,8 +102,18 @@ export class Application {
     const restaurantHandler = new RestaurantHandler()
     const dinnerTimes = []
 
-    restaurantHandler.checkRestaurantBooking(movies[0].day, movies[0].time, restaurantURL)
+    // Create an array of promises (iterate through everyone to check each movie)
+    const dinnerPromises = movies.map((movie) => {
+      // Add 2 hours to the movie start time to get the earliest time to book a table.
+      const time = parseInt(movie.time.slice(0, 2)) + 2
+      return restaurantHandler.checkRestaurantBooking(movie.day, time.toString(), restaurantURL)
+    })
 
+    // Resolve all promises before moving on.
+    const allDinnerTimes = await Promise.all(dinnerPromises)
+
+    console.log(allDinnerTimes)
+    console.log(allMovies)
     // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
   }
 }
