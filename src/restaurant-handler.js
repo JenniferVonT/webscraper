@@ -6,7 +6,7 @@
  */
 
 import axios from 'axios'
-import * as cheerio from 'cheerio'
+import fetch from 'node-fetch'
 
 /**
  * Handles data from a restaurant web page.
@@ -22,47 +22,36 @@ export class RestaurantHandler {
   async checkRestaurantBooking (day, time, url) {
     const availableTables = []
 
-    // Send a post request to the page with the form data and headers.
-    const loginResponse = await axios.post(`${url}login`, {
-      username: 'zeke',
-      password: 'coys',
-      submit: 'login'
-    },
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      maxRedirects: 0,
-      manualRedirect: true
-    })
+    const params = new URLSearchParams()
+    params.append('username', 'zeke')
+    params.append('password', 'coys')
+    params.append('submit', 'login')
 
-    if (loginResponse.status !== 302) {
-      throw new Error('Login failed! Status:', loginResponse.status)
+    try {
+      const loginResponse = await fetch(`${url}login`, {
+        method: 'POST',
+        body: params,
+        redirect: 'manual',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+
+      console.log(loginResponse.headers.raw())
+      console.log(loginResponse.status)
+
+      const sessionCookie = loginResponse.headers.get('set-cookie')
+
+      const redirectResponse = await fetch(`${url}login/booking`, {
+        method: 'GET',
+        headers: {
+          cookie: sessionCookie
+        }
+      })
+
+      console.log(redirectResponse.status)
+    } catch (error) {
+      console.error('Error:', error.message)
     }
-
-    // Get the session cookie from the response headers.
-    const sessionCookie = loginResponse.headers['set-cookie']
-
-    const redirectURL = loginResponse.headers.location
-
-    const redirectResponse = await axios.get(`${url}${redirectURL}`, {
-      headers: {
-        Cookie: sessionCookie
-      }
-    })
-
-    if (redirectResponse.status !== 200) {
-      throw new Error(`Redirect error: ${loginResponse.status}`)
-    }
-
-    console.log('Response Status:', redirectResponse.status)
-    console.log('Response Headers:', redirectResponse.headers)
-
-    const html = redirectResponse.data
-    const dom = cheerio.load(html)
-
-    // Get all friday data.
-    const div = dom('div.WordSection2')
-    const spanElement = div.find('span')
   }
 }
