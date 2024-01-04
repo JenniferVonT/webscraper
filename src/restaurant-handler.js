@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 
-import axios from 'axios'
+import * as cheerio from 'cheerio'
 import fetch from 'node-fetch'
 
 /**
@@ -28,6 +28,7 @@ export class RestaurantHandler {
     params.append('submit', 'login')
 
     try {
+      // Send a POST request with the login data and stop the redirect by setting it to manual.
       const loginResponse = await fetch(`${url}login`, {
         method: 'POST',
         body: params,
@@ -37,19 +38,24 @@ export class RestaurantHandler {
         }
       })
 
-      console.log(loginResponse.headers.raw())
-      console.log(loginResponse.status)
-
+      // Save the session cookie for the login and the redirect URL.
       const sessionCookie = loginResponse.headers.get('set-cookie')
+      const redirectURL = loginResponse.headers.get('location')
 
-      const redirectResponse = await fetch(`${url}login/booking`, {
+      // Send a GET request with the cookie data to get the logged in page.
+      const redirectResponse = await fetch(`${url}${redirectURL}`, {
         method: 'GET',
         headers: {
           cookie: sessionCookie
         }
       })
 
-      console.log(redirectResponse.status)
+      if (redirectResponse.status !== 200) {
+        throw new Error('HTTP error! Status:', redirectResponse.status)
+      }
+
+      const html = await redirectResponse.text()
+      const dom = cheerio.load(html)
     } catch (error) {
       console.error('Error:', error.message)
     }
