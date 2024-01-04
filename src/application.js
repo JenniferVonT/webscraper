@@ -59,6 +59,8 @@ export class Application {
 
   /**
    * Begins the application.
+   *
+   * @returns {string} - If it can't find an available day for everyone it returns a message about it.
    */
   async run () {
     process.stdout.write('Scraping links...')
@@ -90,6 +92,12 @@ export class Application {
     const availableDays = await calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
 
     console.log('OK') // Checking for available days complete.
+
+    // Check if there is any matches on the calendars (if there isn't, availableDays should be a string).
+    // And return the console.log telling the user that escapes the rest of the method.
+    if (!Array.isArray(availableDays)) {
+      return console.log('\x1b[31m%s\x1b[0m', '\n==== There was no available days where all of you could meet! ====')
+    }
 
     // Create a new instance of the movie handler.
     const movieHandler = new MovieHandler()
@@ -161,14 +169,18 @@ export class Application {
       availableDayPlans.push(plans)
     }
 
-    // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
-    console.log('\n\nSuggestions')
-    console.log('\x1b[35m%s\x1b[0m', '===========')
+    // If there is a movie/dinner match then present the day plans for those, otherwise send a message informing the user of that!
+    if (!availableDayPlans.length === 0) {
+      console.log('\n\nSuggestions')
+      console.log('\x1b[35m%s\x1b[0m', '===========')
 
-    for (let i = 0; i < amount; i++) {
-      process.stdout.write('\x1b[33m*\x1b[0m ')
-      process.stdout.write(`On ${availableDayPlans[i].day}, `)
-      console.log('\x1b[32m%s\x1b[0m', `"${availableDayPlans[i].movie}"`, `begins at ${availableDayPlans[i].movieStart}, and there is a free table to book between ${availableDayPlans[i].dinner}`)
+      for (let i = 0; i < amount; i++) {
+        process.stdout.write('\x1b[33m*\x1b[0m ')
+        process.stdout.write(`On ${availableDayPlans[i].day}, `)
+        console.log('\x1b[32m%s\x1b[0m', `"${availableDayPlans[i].movie}"`, `begins at ${availableDayPlans[i].movieStart}, and there is a free table to book between ${availableDayPlans[i].dinner}`)
+      }
+    } else {
+      console.log('\x1b[31m%s\x1b[0m', '\n==== There was no available match for both movies and dinner at Zekes! ====')
     }
   }
 }
