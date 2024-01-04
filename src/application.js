@@ -161,11 +161,14 @@ export class Application {
       availableDayPlans.push(plans)
     }
 
-    console.log(availableDayPlans)
-
     // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
-    /* console.log('\n\nSuggestions')
-    console.log('\x1b[36m%s\x1b[0m', '===========') */
-    // INSERT DAY SUGGESTIONS HERE
+    console.log('\n\nSuggestions')
+    console.log('\x1b[35m%s\x1b[0m', '===========')
+
+    for (let i = 0; i < amount; i++) {
+      process.stdout.write('\x1b[33m*\x1b[0m ')
+      process.stdout.write(`On ${availableDayPlans[i].day}, `)
+      console.log('\x1b[32m%s\x1b[0m', `"${availableDayPlans[i].movie}"`, `begins at ${availableDayPlans[i].movieStart}, and there is a free table to book between ${availableDayPlans[i].dinner}`)
+    }
   }
 }
