@@ -10,7 +10,6 @@ import { LinkScraper } from './link-scraper.js'
 import { CalendarHandler } from './calender-handler.js'
 import { MovieHandler } from './movie-handler.js'
 import { RestaurantHandler } from './restaurant-handler.js'
-import { link } from 'node:fs'
 
 /**
  * Encapsulates a Node application.
@@ -62,14 +61,20 @@ export class Application {
    * Begins the application.
    */
   async run () {
+    process.stdout.write('Scraping links...')
+
     // Get the initial links on the starting site.
     const linkScraper = new LinkScraper()
     const initialLinks = await linkScraper.extractLinks(this.#url)
+
+    console.log('OK') // Link scraping complete.
 
     // Get the correct URLs for the different sites.
     const calendarURL = initialLinks.find(url => /calendar/.test(url))
     const movieURL = initialLinks.find(url => /cinema/.test(url))
     const restaurantURL = initialLinks.find(url => /dinner/.test(url))
+
+    process.stdout.write('Scraping available days...')
 
     // Get all the calendars links (relative paths) and make them absoulte paths.
     const calendars = await linkScraper.extractLinks(calendarURL)
@@ -84,15 +89,21 @@ export class Application {
 
     const availableDays = await calenderHandler.checkForAvailableDate(absoluteCalendarLinks)
 
+    console.log('OK') // Checking for available days complete.
+
     // Create a new instance of the movie handler.
     const movieHandler = new MovieHandler()
     const movies = []
+
+    process.stdout.write('Scraping showtimes...')
 
     // Create an array of promises
     const moviePromises = availableDays.map((day) => movieHandler.availableMovies(day, movieURL))
 
     // Resolve all promises before moving on.
     const allMovies = await Promise.all(moviePromises)
+
+    console.log('OK') // Checking for available showtimes complete.
 
     // Flatten the array of arrays into a single array (the movies constant).
     allMovies.forEach((movie) => {
@@ -101,6 +112,8 @@ export class Application {
 
     const restaurantHandler = new RestaurantHandler()
     const dinnerTimes = []
+
+    process.stdout.write('Scraping possible reservations...')
 
     // Create an array of promises (iterate through everyone to check each movie)
     const dinnerPromises = movies.map((movie) => {
@@ -112,8 +125,47 @@ export class Application {
     // Resolve all promises before moving on.
     const allDinnerTimes = await Promise.all(dinnerPromises)
 
-    console.log(allDinnerTimes)
-    console.log(allMovies)
+    // Save all the available tables in the const dinnerTimes
+    allDinnerTimes.forEach((time) => {
+      if (typeof time === 'object') {
+        dinnerTimes.push(time)
+      }
+    })
+
+    console.log('OK') // Checking for available showtimes complete.
+
+    // Filter out the movies that don't match the dinner times.
+    const matchingMovies = movies.filter(movie => {
+      const matchingDay = dinnerTimes.find(time => time.day === movie.day)
+      if (matchingDay) {
+        const movieTime = parseInt(movie.time.slice(0, 2))
+        const dinnerTime = parseInt(matchingDay.time.slice(0, 2)) - 2
+        if (movieTime <= dinnerTime) {
+          return movie
+        }
+      }
+      return false
+    })
+
+    // Gather all the data.
+    const availableDayPlans = []
+    const amount = dinnerTimes.length
+
+    for (let i = 0; i < amount; i++) {
+      const plans = {
+        day: dinnerTimes[i].day,
+        movie: matchingMovies[i].movie,
+        movieStart: matchingMovies[i].time,
+        dinner: dinnerTimes[i].time
+      }
+      availableDayPlans.push(plans)
+    }
+
+    console.log(availableDayPlans)
+
     // PRESENT AN APPROPRIATE DAY WITH ALL RELEVANT INFORMATION!
+    /* console.log('\n\nSuggestions')
+    console.log('\x1b[36m%s\x1b[0m', '===========') */
+    // INSERT DAY SUGGESTIONS HERE
   }
 }

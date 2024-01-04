@@ -90,7 +90,7 @@ export class RestaurantHandler {
       } else if (matchingTimes.length === 0) {
         return 'No bookable tables matched that time of day'
       } else {
-        return [day, matchingTimes].flat()
+        return { day, time: matchingTimes.toString() }
       }
     } catch (error) {
       console.error('Error:', error.message)
