@@ -16,11 +16,12 @@ export class RestaurantHandler {
    * Checks if there is any free tables during a certain day/time.
    *
    * @param {string} day - What day do you want to book.
-   * @param {string} time - What's the earliest time you want to book.
+   * @param {string} time - The earliest time you want to book.
    * @param {string} url - The restaurant url.
+   * @returns {string[]} - Returns the matching times.
    */
   async checkRestaurantBooking (day, time, url) {
-    const availableTables = []
+    const matchingDinnerTimes = []
 
     const params = new URLSearchParams()
     params.append('username', 'zeke')
@@ -58,12 +59,39 @@ export class RestaurantHandler {
       const dom = cheerio.load(html)
 
       // Get all the input elements with the attribute 'name' with the value 'group1'.
+      // After that get all the value attributes for each element.
       const allAvailableTimes = dom('input[name="group1"]')
       const values = allAvailableTimes.map((index, element) => {
         return dom(element).attr('value')
       }).get()
 
-      console.log(values)
+      // Get the day you want to match and make it fit the same syntax as the value.
+      const dayToBook = day.toLocaleLowerCase().slice(0, 3)
+
+      // Filter so that the only values left are the matching days.
+      const matchingDays = values.filter(value => {
+        return value.startsWith(dayToBook)
+      })
+
+      // Get the time you want to match.
+      const timeToBook = time.slice(0, 2)
+
+      // Filter so that only the times that are the same or later are left.
+      const matchingTimes = matchingDays.filter(value => {
+        const timePart = value.slice(3, 5)
+        return parseInt(timePart) >= parseInt(timeToBook)
+      })
+        .map(value => {
+          const justTheTime = value.slice(3)
+          return `${justTheTime.slice(0, 2)}:00-${justTheTime.slice(2)}:00`
+        })
+
+      // Return the result based on if a match was made.
+      if (matchingDays.length === 0) {
+        return 'No bookable tables matched that day/time! Try a different time.'
+      } else {
+        return [day, matchingTimes].flat()
+      }
     } catch (error) {
       console.error('Error:', error.message)
     }
