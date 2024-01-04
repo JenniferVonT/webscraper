@@ -56,6 +56,14 @@ export class RestaurantHandler {
 
       const html = await redirectResponse.text()
       const dom = cheerio.load(html)
+
+      // Get all the input elements with the attribute 'name' with the value 'group1'.
+      const allAvailableTimes = dom('input[name="group1"]')
+      const values = allAvailableTimes.map((index, element) => {
+        return dom(element).attr('value')
+      }).get()
+
+      console.log(values)
     } catch (error) {
       console.error('Error:', error.message)
     }
